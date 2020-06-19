@@ -1,28 +1,48 @@
 import './global';
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
   StyleSheet,
   Text,
   SafeAreaView,
-  View,
   Image,
-  TouchableHighlight,
-  Alert
+  Linking,
+  Button,
+  Alert,
+  View,
 } from 'react-native';
 const Caver = require('caver-js');
 const eoa = "0xD85FCeCE453d605afcbf6924C3Bc803060161C36";
+const supportedURL = "https://google.com";
+const unsupportedURL = "slack://open?team=123456";
 
 interface States {
   latestBlock: number
   balance: number
 }
 
+const OpenURLButton = ({ url, children }) => {
+  const handlePress = useCallback(async () => {
+    // Checking if the link is supported for links with custom URL scheme.
+    const supported = await Linking.canOpenURL(url);
+
+    if (supported) {
+      // Opening the link with some app, if the URL scheme is "http" the web link should be opened
+      // by some browser in the mobile
+      await Linking.openURL(url);
+    } else {
+      Alert.alert(`Don't know how to open this URL: ${url}`);
+    }
+  }, [url]);
+
+  return <Button title={children} onPress={handlePress} />;
+};
+
 export default class App extends React.Component<{}, States> {
   constructor(props: Readonly<{}>) {
     super(props);
     this.state = {
       latestBlock: -1,
-      balance: 9.999,
+      balance: 1.0,
     }
   }
 
@@ -38,13 +58,13 @@ export default class App extends React.Component<{}, States> {
       })
     }
     refresh()
-
-    setInterval(refresh, 5000);
   }
 
   render() {
     const latestBlockNumber = this.state.latestBlock;
     const balance = this.state.balance;
+    const OpenURLButton = () => Linking.openURL('kakaotalk://klipwallet/open?url=https://klip.qa.klaytn.com/?target=/token/2/send')
+
 
     return (
       <SafeAreaView style={styles.container}>
@@ -58,11 +78,9 @@ export default class App extends React.Component<{}, States> {
         <Text></Text>
         <Text>* Latest BN: {latestBlockNumber}</Text>
         <Text></Text>
-
-        <View>
-          <TouchableHighlight style={styles.button} onPress={() => Alert.alert('TBA')}>
-            <Text>Kakao Login</Text>
-          </TouchableHighlight>
+        <View style={styles.container}>
+          <OpenURLButton url={supportedURL}>Open Supported URL</OpenURLButton>
+          <OpenURLButton url={unsupportedURL}>Open Unsupported URL</OpenURLButton>
         </View>
       </SafeAreaView>
     );
