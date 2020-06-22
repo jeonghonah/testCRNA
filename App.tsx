@@ -63,7 +63,7 @@ export default class App extends React.Component<{}, States> {
   render() {
     const latestBlockNumber = this.state.latestBlock;
     const balance = this.state.balance;
-    const OpenURLButton = () => Linking.openURL('kakaotalk://klipwallet/open?url=https://klip.qa.klaytn.com/?target=/token/2/send')
+    const openURLButton = () => Linking.openURL('kakaotalk://klipwallet/open?url=https://klip.qa.klaytn.com/?target=/token/2/send')
 
 
     return (
